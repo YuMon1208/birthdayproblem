@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>生日悖論模擬器</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f6f8;
+    text-align:center;
+    padding:40px;
+}
+
+.container{
+    background:white;
+    padding:30px;
+    border-radius:10px;
+    max-width:700px;
+    margin:auto;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+button{
+    padding:10px 20px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+input{
+    padding:8px;
+    font-size:16px;
+    width:80px;
+}
+
+.result{
+    margin-top:20px;
+    font-size:18px;
+}
+
+.list{
+    margin-top:20px;
+    text-align:left;
+    max-height:300px;
+    overflow:auto;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🎂 生日悖論模擬器</h1>
+
+<p>輸入人數，隨機產生生日，看看是否有人同一天生日</p>
+
+<input id="people" type="number" value="23" min="2" max="200">
+
+<button onclick="simulate()">開始模擬</button>
+
+<div class="result" id="result"></div>
+
+<div class="result" id="probability"></div>
+
+<div class="list" id="list"></div>
+
+</div>
+
+<script>
+
+function randomBirthday(){
+    return Math.floor(Math.random()*365)+1
+}
+
+function dayToDate(day){
+    const start = new Date(2024,0)
+    start.setDate(day)
+    return (start.getMonth()+1) + "/" + start.getDate()
+}
+
+function theoreticalProbability(n){
+
+    let p = 1
+
+    for(let i=0;i<n;i++){
+        p *= (365-i)/365
+    }
+
+    return (1-p)*100
+}
+
+function simulate(){
+
+    const n = parseInt(document.getElementById("people").value)
+
+    let birthdays=[]
+    let map={}
+    let duplicate=false
+
+    for(let i=0;i<n;i++){
+
+        let b = randomBirthday()
+        birthdays.push(b)
+
+        if(map[b]){
+            duplicate=true
+        }else{
+            map[b]=true
+        }
+    }
+
+    const listDiv=document.getElementById("list")
+    listDiv.innerHTML=""
+
+    birthdays.forEach((b,i)=>{
+        const div=document.createElement("div")
+        div.textContent="Person "+(i+1)+" : "+dayToDate(b)
+        listDiv.appendChild(div)
+    })
+
+    const result=document.getElementById("result")
+
+    if(duplicate){
+        result.innerHTML="🎉 有人生日相同！"
+        result.style.color="green"
+    }else{
+        result.innerHTML="❌ 沒有人生日相同"
+        result.style.color="red"
+    }
+
+    const prob = theoreticalProbability(n).toFixed(2)
+
+    document.getElementById("probability").innerHTML=
+        "理論上至少兩人同生日的機率: <b>"+prob+"%</b>"
+}
+
+</script>
+
+</body>
+</html>
